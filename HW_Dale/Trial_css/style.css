@@ -1,0 +1,59 @@
+body{
+    background: #42455a;
+}
+
+.container{
+    width: 100%;
+    height: 100%;
+    background-color: gray;
+}
+
+.menu ul {
+    display: inline-flex;
+    margin: 50px;
+}
+
+.menu ul li{
+    list-style: none;
+    margin: 0 20px;
+    color: b2b1b1;
+    cursor: pointer;
+}
+
+.logo img{
+    width: 30px;
+    margin-top: -7px;
+    margin-right: 48px;
+}
+
+.active {
+    color: thistle;
+    text-decoration: none;
+    border: 2px solid transparent;
+    border-radius: 100px;
+    background-image: linear-gradient(#42455a, #42455a),radial-gradient(circle at top left, gray, #19d7f8);
+    background-origin: border-box;
+    background-clip: content-box,border-box;
+}
+
+.banner{
+    width: 80%;
+    height: 70%;
+    top: 25%;
+    left: 130px;
+    position: absolute;
+    color: white;
+}
+
+.app-text{
+    width: 50%;
+    float: left;
+ }
+
+
+.app-text h1{
+    font-size: 43px;
+    width: 640px;
+    position: relative;
+    margin-left: 40px;
+ }
