@@ -1,80 +1,119 @@
-var json = d3.json("samples.json").then(data => data)
-// D3 to read data  
-  
-  d3.json("samples.json").then(data => {
-    console.log(data)})
+// Create default charts and metadata
 
-///////////////////////////////////////////////////////////////////////
-// BAR GRAPH
-function buildPlot() {
-  d3.json("samples.json").then(data => {
-    // Grab values from the data json object to build the plots
-    var sampleValues = data.samples[0].sample_values;
-    var topValues = sampleValues.slice(0, 10).reverse();
-    var otuIDs = data.samples[0].otu_ids;
-    var otuTop = (data.samples[0].otu_ids.slice(0, 10)).reverse();
-    var otuID = otuTop.map(d => "OTU " + d);
-    var otuLabels = data.samples[0].otu_labels;
-    console.log(otuID);
-  
-    var trace1 = {
-      x: topValues,
-      y: otuID,
-      text: otuID,
-      type: "bar",
-      orientation: "h"
-    };
+function init () {
 
-    var layout1 = {
-    title: "Top 10 OTUs",
-    };
+    d3.json('samples.json').then(importedData => {
+        var data = importedData;
+        // otu ids as labels
+        var otuIDs = data.samples[0].otu_ids;
+        var topOtuIDs = otuIDs.map(d => "OTU " + d).slice(0,10).reverse();
+            console.log(topOtuIDs);
 
-    Plotly.newPlot("bar", [trace1], layout1);
+        // sample values as values
+        var sampleValues = data.samples[0].sample_values;
+        var topSampleValues = sampleValues.slice(0,10).reverse();
+            console.log(topSampleValues);
+
+        // otu labels as hover
+        var otuLabels = data.samples[0].otu_labels;
+        var topOtuLabels = otuLabels.slice(0,10).reverse();
+            console.log(topOtuLabels);
+
+        ///////////////////BAR////////////////////////
+
+        // Create trace
+        var trace1 = {
+            x: topSampleValues,
+            y: topOtuIDs,
+            text: topOtuLabels,
+            type: "bar",
+            orientation: "h"
+        };
+        // Create layout
+        var layout = {
+            title: "ID: " + data.samples[0].id,
+            xaxis: {title: "Sample Values"},
+            yaxis: {title: "OTU ID"}
+        };
+
+        // Create default plot
+        Plotly.newPlot("bar", [trace1], layout);
 
 
-///////////////////////////////////////////////////////////////////////////
-// BUBBLE GRAPH
+        ///////////////////BUBBLE////////////////////////
 
-    var trace2 = {
-      x: otuIDs,
-      y: sampleValues,
-      mode: "markers",
-      marker: {
-        size: sampleValues,
-        color: otuIDs
-      },
-      text: otuLabels
+        var trace2 = {
+             // Use `otu_ids` for the x values
+            x: otuIDs,
+            //  Use `sample_values` for the y values
+            y: sampleValues,
+            //  Use `otu_labels` for the text values
+            text: otuLabels,
+            mode: 'markers',
+            marker: {
+              //  Use `otu_ids` for the marker colors
+              color: otuIDs,
+              //  Use `sample_values` for the marker size
+              size: sampleValues
+            }
+          };
+          
+          var layout = {
+              title: "ID: " + data.samples[0].id,
+              xaxis: {title: "OTU ID"},
+              yaxis: {title: "Sample Values"}
+          };
+          
+          Plotly.newPlot('bubble', [trace2], layout);
 
-    };
+       
+        ///////////////////METADATA////////////////////////
+        // Select metadata
+        var metaData = data.metadata;
+        // Select the element
+        var demographicInfo = d3.select("#sample-metadata")
+        // Append entries
+        Object.entries(metaData[0]).map((key) => {
+            demographicInfo.append("h5").text(key[0] + ": " + key[1]);  
+        })
 
-// set the layout for the bubble plot
-    var layout2 = {
-      xaxis:{title: "OTU ID"},
-    };
 
-// create the bubble plot
-   Plotly.newPlot("bubble", [trace2], layout2); 
-  });
+        //////////////////////DROPDOWN/////////////////////
+        var sampleIDs = data.names;
+            console.log(sampleIDs)
+        var dropdown = d3.select("#selDataset")
+        sampleIDs.forEach(function(name) {
+             dropdown.append("option").text(name).property("value");
+        });
+})
 }
+// Call the init function
+init()
 
-buildPlot();
+
+// Update functions
+
+var dropdown = d3.select("#selDataset");
+
+function optionChanged (id) {
+    var value = dropdown.property("value")
+    console.log(value)
+
+    d3.json('samples.json').then(importedData => {
+        var data = importedData;
+
+        ////////////////METADATA////////////////////
+        var metadata = data.metadata;
+        result = metadata.filter(meta => meta.id.toString() === value)[0];
+            console.log(result);
+        var demographicInfo = d3.select("#sample-metadata").text("");
+        Object.entries(result).map((key) => {
+            demographicInfo.append("h5").text(key[0] + ": " + key[1]);
+        });
 
 
-///////////////////////////////////////////////////////////////////////////
+        ////////////////BAR GRAPH////////////////////
 
-// Creating dropdown
-function dropDown() {
-  var dropdown = d3.select("#selDataset")
-  d3.json("samples.json").then(data => {
-    var names =  data.names
-    names.forEach(subject => {
-      dropdown.append("option").text(subject).property("value")
+
     })
-  })
-  buildPlots(data.names[0]);
-  getDemoInfo(data.names[0]);
 }
-
-dropDown();
-
-///////////////////////////////////////////////////////////////////////////
