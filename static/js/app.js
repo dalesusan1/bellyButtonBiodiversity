@@ -7,17 +7,17 @@ function init () {
         // otu ids as labels
         var otuIDs = data.samples[0].otu_ids;
         var topOtuIDs = otuIDs.map(d => "OTU " + d).slice(0,10).reverse();
-            console.log(topOtuIDs);
+        console.log(topOtuIDs);
 
         // sample values as values
         var sampleValues = data.samples[0].sample_values;
         var topSampleValues = sampleValues.slice(0,10).reverse();
-            console.log(topSampleValues);
+        console.log(topSampleValues);
 
         // otu labels as hover
         var otuLabels = data.samples[0].otu_labels;
         var topOtuLabels = otuLabels.slice(0,10).reverse();
-            console.log(topOtuLabels);
+        console.log(topOtuLabels);
 
         ///////////////////BAR////////////////////////
 
@@ -80,7 +80,7 @@ function init () {
 
         //////////////////////DROPDOWN/////////////////////
         var sampleIDs = data.names;
-            console.log(sampleIDs)
+        console.log(sampleIDs)
         var dropdown = d3.select("#selDataset")
         sampleIDs.forEach(function(name) {
              dropdown.append("option").text(name).property("value");
@@ -104,8 +104,9 @@ function optionChanged (id) {
 
         ////////////////METADATA////////////////////
         var metadata = data.metadata;
+        console.log(metadata)
         result = metadata.filter(meta => meta.id.toString() === value)[0];
-            console.log(result);
+        console.log(result);
         var demographicInfo = d3.select("#sample-metadata").text("");
         Object.entries(result).map((key) => {
             demographicInfo.append("h5").text(key[0] + ": " + key[1]);
@@ -113,6 +114,70 @@ function optionChanged (id) {
 
 
         ////////////////BAR GRAPH////////////////////
+        var barData = data.samples;
+        console.log(barData)
+        var barResult = barData.filter(d => d.id === value)[0]
+        console.log(barResult)
+
+        //Sample values
+        var sampleValues = barResult.sample_values
+        var topSampleValues = sampleValues.slice(0,10).reverse();
+        console.log(topSampleValues);
+
+        // Otu ids as labels
+        var otuIDs = barResult.otu_ids;
+        var topOtuIDs = otuIDs.map(d => "OTU " + d).slice(0,10).reverse();
+        console.log(topOtuIDs);
+        
+         // otu labels as hover
+         var otuLabels = barResult.otu_labels;
+         var topOtuLabels = otuLabels.slice(0,10).reverse();
+         console.log(topOtuLabels);
+
+         // Create trace
+        var trace1 = {
+            x: topSampleValues,
+            y: topOtuIDs,
+            text: topOtuLabels,
+            type: "bar",
+            orientation: "h"
+        };
+        // Create layout
+        var layout = {
+            title: "ID: " + barResult.id,
+            xaxis: {title: "Sample Values"},
+            yaxis: {title: "OTU ID"}
+        };
+
+        // Create default plot
+        Plotly.newPlot("bar", [trace1], layout);
+
+
+        ////////////////BUBBLE////////////////////
+
+        var trace2 = {
+            // Use `otu_ids` for the x values
+           x: otuIDs,
+           //  Use `sample_values` for the y values
+           y: sampleValues,
+           //  Use `otu_labels` for the text values
+           text: otuLabels,
+           mode: 'markers',
+           marker: {
+             //  Use `otu_ids` for the marker colors
+             color: otuIDs,
+             //  Use `sample_values` for the marker size
+             size: sampleValues
+           }
+         };
+         
+         var layout = {
+             title: "ID: " + barResult.id,
+             xaxis: {title: "OTU ID"},
+             yaxis: {title: "Sample Values"}
+         };
+         
+         Plotly.newPlot('bubble', [trace2], layout);
 
 
     })
